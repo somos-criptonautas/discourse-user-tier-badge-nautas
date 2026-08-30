@@ -1,0 +1,13 @@
+en:
+  theme_metadata:
+    description: "User badge with custom tier progress, for use in a sidebar"
+    settings:
+      render_in_sidebar: "Render the badge in the sidebar blocks outlet. Turn this off to place the block yourself from another theme."
+      tier_cache_ttl: "The duration (in minutes) for which earned badges are cached in the browser. Reduces server load by preventing re-fetching on every page refresh. (Default: 10)"
+      tiers: "Badge sets that make up each tier. `name` is a theme locale key under `user_badge.tiers`, `badge_ids` is a comma-separated list of badge ids, `group` is the group unlocked by the tier, picked from the groups on this site. A tier counts as complete only when every badge in its list is earned; rows are evaluated top to bottom."
+  user_badge:
+    karma: "Karma"
+    tiers:
+      tier_1: "Tier 1"
+      tier_2: "Tier 2"
+      tier_3: "Tier 3"

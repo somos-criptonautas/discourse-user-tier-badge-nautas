@@ -1,0 +1,89 @@
+// Self-contained: core colour scheme variables only, so the component inherits
+// whatever theme it is attached to.
+.user-tier-badge {
+  &__layout {
+    background: var(--secondary);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--d-border-radius-large);
+    overflow: hidden;
+  }
+
+  &__link {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-4) var(--space-5);
+    color: var(--primary);
+
+    &:hover,
+    &:focus {
+      background: var(--primary-very-low);
+      color: var(--tertiary);
+      text-decoration: none;
+    }
+
+    .avatar {
+      flex: 0 0 auto;
+    }
+  }
+
+  &__identity {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  &__name {
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__username {
+    color: var(--primary-medium);
+    font-size: var(--font-down-1);
+  }
+
+  &__progress {
+    padding: 0 var(--space-5) var(--space-4);
+  }
+
+  &__progress-label {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-2);
+    margin-bottom: var(--space-2);
+    font-size: var(--font-down-1);
+    font-weight: 700;
+  }
+
+  &__progress-count {
+    color: var(--primary-medium);
+    font-weight: 400;
+  }
+
+  progress {
+    display: block;
+    appearance: none;
+    width: 100%;
+    height: 0.5rem;
+    border: none;
+    border-radius: var(--d-border-radius);
+    background: var(--primary-very-low);
+    overflow: hidden;
+
+    &::-webkit-progress-bar {
+      background: var(--primary-very-low);
+    }
+
+    &::-webkit-progress-value {
+      background: var(--tertiary);
+    }
+
+    &::-moz-progress-bar {
+      background: var(--tertiary);
+    }
+  }
+}

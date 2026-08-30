@@ -1,0 +1,35 @@
+render_in_sidebar:
+  default: true
+  type: bool
+
+tier_cache_ttl:
+  default: 10
+  type: integer
+  min: 1
+  max: 1440
+
+tiers:
+  type: objects
+  default:
+    - name: "user_badge.tiers.tier_1"
+      badge_ids: ""
+      group: []
+    - name: "user_badge.tiers.tier_2"
+      badge_ids: ""
+      group: []
+    - name: "user_badge.tiers.tier_3"
+      badge_ids: ""
+      group: []
+  schema:
+    name: tier
+    identifier: name
+    properties:
+      name:
+        type: string
+        required: true
+      badge_ids:
+        type: string
+      group:
+        type: groups
+        min: 0
+        max: 1
