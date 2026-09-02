@@ -113,7 +113,7 @@ export default class BlockUserTierBadge extends Component {
 
     // Every tier's group is held: the journey is complete.
     if (tiers.every((tier) => tier.hasGroup)) {
-      return { type: "done" };
+      return { isDone: true };
     }
 
     const next = tiers.find((tier) => !tier.hasGroup);
@@ -134,13 +134,13 @@ export default class BlockUserTierBadge extends Component {
           score = 0;
         }
         if (score >= (settings.karma_goal || 9999)) {
-          return { type: "almost", tier: next };
+          return { isAlmost: true, tier: next };
         }
       }
     }
 
     if (next.max > 0) {
-      return { type: "tier", tier: next };
+      return { isTier: true, tier: next };
     }
 
     // Next tier has no badge ids configured: nothing meaningful to show.
@@ -169,19 +169,19 @@ export default class BlockUserTierBadge extends Component {
         <AsyncContent @asyncData={{this.loadProgress}}>
           <:content as |data|>
             {{#if data}}
-              {{#if (eq data.type "done")}}
+              {{#if data.isDone}}
                 <div
                   class="user-tier-badge__message user-tier-badge__message--done"
                 >
                   {{i18n (themePrefix settings.completed_message)}}
                 </div>
-              {{else if (eq data.type "almost")}}
+              {{else if data.isAlmost}}
                 <div
                   class="user-tier-badge__message user-tier-badge__message--almost"
                 >
                   {{i18n (themePrefix settings.almost_there_message)}}
                 </div>
-              {{else if (eq data.type "tier")}}
+              {{else if data.isTier}}
                 <div class="user-tier-badge__progress">
                   <span class="user-tier-badge__progress-label">
                     {{#if data.tier.groupName}}
