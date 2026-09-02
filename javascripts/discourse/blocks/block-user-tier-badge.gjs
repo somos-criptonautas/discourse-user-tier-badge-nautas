@@ -173,13 +173,13 @@ export default class BlockUserTierBadge extends Component {
                 <div
                   class="user-tier-badge__message user-tier-badge__message--done"
                 >
-                  {{i18n (themePrefix settings.completed_message)}}
+                  {{i18n (themePrefix "user_badge.completed")}}
                 </div>
               {{else if data.isAlmost}}
                 <div
                   class="user-tier-badge__message user-tier-badge__message--almost"
                 >
-                  {{i18n (themePrefix settings.almost_there_message)}}
+                  {{i18n (themePrefix "user_badge.almost_there")}}
                 </div>
               {{else if data.isTier}}
                 <div class="user-tier-badge__progress">

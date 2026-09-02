@@ -16,17 +16,6 @@ karma_goal:
   type: integer
   min: 1
 
-# Message shown when the user holds the group of every configured tier.
-completed_message:
-  default: "user_badge.completed"
-  type: string
-
-# Message shown when the user reached the karma goal but has not yet earned the
-# last tier's second (extraordinary contribution) badge.
-almost_there_message:
-  default: "user_badge.almost_there"
-  type: string
-
 tiers:
   type: objects
   default:
