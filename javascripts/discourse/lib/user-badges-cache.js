@@ -1,53 +1,38 @@
-const CACHE_VERSION = "v1";
+// Version is part of the key, so bumping it orphans every old entry instead of
+// needing a migration.
+const CACHE_VERSION = "v2";
 
-function storageKey(userId) {
-  return `utb:${CACHE_VERSION}:user:${userId}:userBadges`;
+function storageKey(name, userId) {
+  return `utb:${CACHE_VERSION}:${userId ?? "site"}:${name}`;
 }
 
-// Returns the cached badge ids for the user, or null when absent/stale/unreadable.
-export function loadBadgeIds(userId) {
-  const key = storageKey(userId);
+// Runs `loader` through localStorage, honouring the tier_cache_ttl setting.
+// Anything unreadable, stale or unparseable is simply refetched. Pass a null
+// userId for site-wide data that is the same for everyone.
+export async function cachedFetch(name, userId, loader) {
+  const key = storageKey(name, userId);
 
   try {
     const stored = localStorage.getItem(key);
-    if (!stored) {
-      return null;
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const ttl = (settings.tier_cache_ttl || 10) * 60000;
+
+      if (parsed?.timestamp && Date.now() - parsed.timestamp <= ttl) {
+        return parsed.data;
+      }
     }
-
-    const parsed = JSON.parse(stored);
-    const ttl = (settings.tier_cache_ttl || 10) * 60000;
-
-    if (
-      !parsed ||
-      parsed.version !== CACHE_VERSION ||
-      parsed.userId !== String(userId) ||
-      !parsed.timestamp ||
-      Date.now() - parsed.timestamp > ttl ||
-      !Array.isArray(parsed.data)
-    ) {
-      localStorage.removeItem(key);
-      return null;
-    }
-
-    return parsed.data;
   } catch {
     // Unreadable entry, or localStorage unavailable entirely. Refetch instead.
-    return null;
   }
-}
 
-export function saveBadgeIds(userId, badgeIds) {
+  const data = await loader();
+
   try {
-    localStorage.setItem(
-      storageKey(userId),
-      JSON.stringify({
-        version: CACHE_VERSION,
-        userId: String(userId),
-        timestamp: Date.now(),
-        data: badgeIds,
-      })
-    );
+    localStorage.setItem(key, JSON.stringify({ timestamp: Date.now(), data }));
   } catch {
     // localStorage may be unavailable or full. The block still works uncached.
   }
+
+  return data;
 }
