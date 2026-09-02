@@ -1,15 +1,19 @@
 import { apiInitializer } from "discourse/lib/api";
 import BlockUserTierBadge from "../blocks/block-user-tier-badge";
 
-// Registered into the sidebar blocks outlet so any right-sidebar component can
-// pick it up. The block itself is registered by its @block id, so a theme can
-// also place it in its own renderBlocks call instead.
+// Renders the badge into whichever outlet the site's sidebar exposes. The
+// outlet name is a setting because outlets differ between themes: core ships
+// "homepage-blocks" and "category-sidebar-blocks", and a theme can register its
+// own. Leave the setting empty to place the block yourself from another theme
+// (it is registered by name in the pre-initializer).
 export default apiInitializer((api) => {
-  if (!settings.render_in_sidebar) {
+  const outlet = settings.sidebar_outlet?.trim();
+
+  if (!outlet) {
     return;
   }
 
-  api.renderBlocks("sidebar-blocks", [
+  api.renderBlocks(outlet, [
     {
       block: BlockUserTierBadge,
       id: "user-tier-badge",
