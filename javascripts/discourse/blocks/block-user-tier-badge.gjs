@@ -9,8 +9,6 @@ import getURL from "discourse/lib/get-url";
 import { i18n } from "discourse-i18n";
 import { loadBadgeIds, saveBadgeIds } from "../lib/user-badges-cache";
 
-const KARMA_GOAL = 9999;
-
 @block("theme:user-tier-badge:badge", {
   description: "Current user avatar, profile link and tier progress",
 })
@@ -55,50 +53,98 @@ export default class BlockUserTierBadge extends Component {
     return id ? this.site.groupsById?.[id]?.name : null;
   }
 
-  // Progress towards the first unfinished tier, or towards the karma goal once
-  // every tier is complete. Null when no tier has usable badge ids configured.
+  // True when the current user is a member of the tier's unlocked group.
+  hasGroup(group) {
+    const id = [].concat(group ?? [])[0];
+    if (!id) {
+      return false;
+    }
+    return this.currentUser.groups?.some((g) => g.id === id);
+  }
+
+  // Parse a tier's badge_ids setting into a deduped number array. A repeated id
+  // must not inflate the denominator.
+  parseBadgeIds(raw) {
+    return [
+      ...new Set(
+        String(raw || "")
+          .split(",")
+          .map((id) => parseInt(id, 10))
+          .filter((id) => !isNaN(id))
+      ),
+    ];
+  }
+
+  // All-time gamification score for the current user. /leaderboard already
+  // defaults to all_time, but we pass the period explicitly to be safe.
+  async allTimeScore() {
+    const leaderboard = await ajax("/leaderboard", {
+      data: { period: "all_time" },
+    });
+    return leaderboard.personal?.user?.total_score || 0;
+  }
+
+  // Build the per-tier view model.
   @bind
   async loadProgress() {
-    const tiers = (settings.tiers || [])
-      .map((tier) => ({
-        tier,
-        // Deduped: a repeated id must not inflate the denominator.
-        badgeIds: [
-          ...new Set(
-            String(tier.badge_ids || "")
-              .split(",")
-              .map((id) => parseInt(id, 10))
-              .filter((id) => !isNaN(id))
-          ),
-        ],
-      }))
-      .filter(({ badgeIds }) => badgeIds.length);
+    const tierDefs = settings.tiers || [];
 
-    if (!tiers.length) {
+    if (!tierDefs.length) {
       return null;
     }
 
     const earned = new Set(await this.earnedBadgeIds());
 
-    for (const { tier, badgeIds } of tiers) {
+    const tiers = tierDefs.map((tier, index) => {
+      const badgeIds = this.parseBadgeIds(tier.badge_ids);
       const value = badgeIds.filter((id) => earned.has(id)).length;
 
-      if (value < badgeIds.length) {
-        return {
-          label: tier.name,
-          groupName: this.groupName(tier.group),
-          value,
-          max: badgeIds.length,
-        };
+      return {
+        name: tier.name,
+        group: tier.group,
+        groupName: this.groupName(tier.group),
+        hasGroup: this.hasGroup(tier.group),
+        badgeIds,
+        value,
+        max: badgeIds.length,
+        isLast: index === tierDefs.length - 1,
+      };
+    });
+
+    // Every tier's group is held: the journey is complete.
+    if (tiers.every((tier) => tier.hasGroup)) {
+      return { type: "done" };
+    }
+
+    const next = tiers.find((tier) => !tier.hasGroup);
+
+    // Last tier special case: the first badge id is the one awarded at the
+    // karma goal. If the user reached the goal (first badge) but not the second
+    // (extraordinary contribution) badge, nudge them.
+    if (next.isLast && next.badgeIds.length >= 2) {
+      const [karmaBadgeId, secondBadgeId] = next.badgeIds;
+      const hasKarmaBadge = earned.has(karmaBadgeId);
+      const hasSecondBadge = earned.has(secondBadgeId);
+
+      if (hasKarmaBadge && !hasSecondBadge) {
+        let score = 0;
+        try {
+          score = await this.allTimeScore();
+        } catch {
+          score = 0;
+        }
+        if (score >= (settings.karma_goal || 9999)) {
+          return { type: "almost", tier: next };
+        }
       }
     }
 
-    const leaderboard = await ajax("/leaderboard");
+    if (next.max > 0) {
+      return { type: "tier", tier: next };
+    }
 
-    return {
-      value: leaderboard.personal?.user?.total_score || 0,
-      max: KARMA_GOAL,
-    };
+    // Next tier has no badge ids configured: nothing meaningful to show.
+    return null;
   }
 
   <template>
@@ -123,27 +169,40 @@ export default class BlockUserTierBadge extends Component {
         <AsyncContent @asyncData={{this.loadProgress}}>
           <:content as |data|>
             {{#if data}}
-              <div class="user-tier-badge__progress">
-                <span class="user-tier-badge__progress-label">
-                  {{#if data.label}}
-                    {{#if data.groupName}}
-                      <a href="/g/{{data.groupName}}">
-                        {{i18n (themePrefix data.label)}}
+              {{#if (eq data.type "done")}}
+                <div
+                  class="user-tier-badge__message user-tier-badge__message--done"
+                >
+                  {{i18n (themePrefix settings.completed_message)}}
+                </div>
+              {{else if (eq data.type "almost")}}
+                <div
+                  class="user-tier-badge__message user-tier-badge__message--almost"
+                >
+                  {{i18n (themePrefix settings.almost_there_message)}}
+                </div>
+              {{else if (eq data.type "tier")}}
+                <div class="user-tier-badge__progress">
+                  <span class="user-tier-badge__progress-label">
+                    {{#if data.tier.groupName}}
+                      <a href="/g/{{data.tier.groupName}}">
+                        {{i18n (themePrefix data.tier.name)}}
                       </a>
                     {{else}}
-                      <span>{{i18n (themePrefix data.label)}}</span>
+                      <span>{{i18n (themePrefix data.tier.name)}}</span>
                     {{/if}}
-                  {{else}}
-                    {{i18n (themePrefix "user_badge.karma")}}
-                  {{/if}}
-                  <span class="user-tier-badge__progress-count">
-                    {{data.value}}
-                    /
-                    {{data.max}}
+                    <span class="user-tier-badge__progress-count">
+                      {{data.tier.value}}
+                      /
+                      {{data.tier.max}}
+                    </span>
                   </span>
-                </span>
-                <progress value={{data.value}} max={{data.max}}></progress>
-              </div>
+                  <progress
+                    value={{data.tier.value}}
+                    max={{data.tier.max}}
+                  ></progress>
+                </div>
+              {{/if}}
             {{/if}}
           </:content>
         </AsyncContent>

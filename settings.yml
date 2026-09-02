@@ -1,12 +1,31 @@
-render_in_sidebar:
-  default: true
-  type: bool
+sidebar_outlet:
+  default: "sidebar-blocks"
+  type: string
 
 tier_cache_ttl:
   default: 10
   type: integer
   min: 1
   max: 1440
+
+# Total gamification points (all-time) that unlock the first badge of the last
+# tier. The last tier's badge_ids list must begin with the badge awarded at this
+# score; the second id is the "extraordinary contribution" badge.
+karma_goal:
+  default: 9999
+  type: integer
+  min: 1
+
+# Message shown when the user holds the group of every configured tier.
+completed_message:
+  default: "user_badge.completed"
+  type: string
+
+# Message shown when the user reached the karma goal but has not yet earned the
+# last tier's second (extraordinary contribution) badge.
+almost_there_message:
+  default: "user_badge.almost_there"
+  type: string
 
 tiers:
   type: objects

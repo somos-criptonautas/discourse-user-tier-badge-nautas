@@ -2,11 +2,13 @@ es:
   theme_metadata:
     description: "Insignia de usuario con progreso de niveles personalizados, para usar en una barra lateral"
     settings:
-      render_in_sidebar: "Muestra la insignia en el punto de inserción de bloques de la barra lateral. Desactívalo para colocar el bloque tú mismo desde otro tema."
+      sidebar_outlet: "Punto de inserción de bloques donde se muestra la insignia. El núcleo incluye `homepage-blocks` y `category-sidebar-blocks`; un tema puede registrar otros. Déjalo vacío para colocar el bloque tú mismo desde otro tema, con el nombre `theme:user-tier-badge:badge`."
       tier_cache_ttl: "Duración (en minutos) durante la que las insignias conseguidas se guardan en caché en el navegador. Reduce la carga del servidor al evitar volver a pedirlas en cada recarga de página. (Por defecto: 10)"
       tiers: "Conjuntos de insignias que componen cada nivel. `name` es una clave de traducción del tema bajo `user_badge.tiers`, `badge_ids` es una lista de ids de insignia separados por comas y `group` es el grupo que desbloquea el nivel, elegido entre los grupos de este sitio. Un nivel solo se considera completo cuando se han conseguido todas las insignias de su lista; las filas se evalúan de arriba abajo."
   user_badge:
     karma: "Karma"
+    completed: "Has completado todos los niveles. Gracias por ser parte de esto."
+    almost_there: "Estás muy cerca, solo piensa fuera de la caja"
     tiers:
       tier_1: "Nivel 1"
       tier_2: "Nivel 2"
