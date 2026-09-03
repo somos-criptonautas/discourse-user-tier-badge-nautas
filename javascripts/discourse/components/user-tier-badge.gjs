@@ -82,13 +82,15 @@ export default class UserTierBadge extends Component {
   }
 
   // A tier's group can be granted without the badges — by subscription or by
-  // hand — so holding it satisfies the tier on its own.
+  // hand — so holding it satisfies the tier on its own. visibleGroups, not the
+  // deprecated groups alias: a group the server does not serialize is simply
+  // not counted, which fails towards showing the tier as still open.
   hasGroup(group) {
     const id = [].concat(group ?? [])[0];
     if (!id) {
       return false;
     }
-    return this.currentUser.groups?.some((g) => g.id === id) ?? false;
+    return this.currentUser.visibleGroups?.some((g) => g.id === id) ?? false;
   }
 
   // Tiers are evaluated top to bottom: the block shows the first unsatisfied

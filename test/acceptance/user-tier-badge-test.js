@@ -7,7 +7,7 @@ const ALICE = {
   name: "Alice",
   username: "alice",
   avatar_template: "/user_avatar/localhost/alice/{size}/1.png",
-  groups: [],
+  visibleGroups: [],
 };
 
 // Every badge referenced by the tiers below, so the checklist can name and
@@ -211,7 +211,7 @@ acceptance("User Tier Badge | almost there", function (needs) {
 acceptance("User Tier Badge | group granted without badges", function (needs) {
   // Tier 2's group arrived by subscription, so the block skips past it to
   // tier 3 even though none of tier 2's badges are earned.
-  needs.user({ ...ALICE, groups: [{ id: 42 }] });
+  needs.user({ ...ALICE, visibleGroups: [{ id: 42 }] });
 
   needs.pretender((server, helper) => {
     server.get("/badges.json", () => helper.response({ badges: SITE_BADGES }));
