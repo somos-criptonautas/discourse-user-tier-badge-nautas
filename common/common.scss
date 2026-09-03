@@ -196,3 +196,19 @@
     }
   }
 }
+
+// discourse-right-sidebar-blocks wraps every block in .rs-component, and themes
+// commonly style that as a card. Our own frame would then be a second one, so
+// drop it and keep only the inner padding. The stats row keeps its separators.
+.rs-component .user-tier-badge__layout {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+// The host renders its wrapper whether or not the block produces anything, and
+// for anonymous visitors this one produces nothing. Collapse the wrapper so no
+// empty framed box is left in the sidebar.
+.rs-component.rs-user-tier-badge:not(:has(.user-tier-badge__layout)) {
+  display: none;
+}
