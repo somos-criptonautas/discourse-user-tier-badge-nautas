@@ -8,6 +8,16 @@ tier_cache_ttl:
   min: 1
   max: 1440
 
+show_recent_badges:
+  default: true
+  type: bool
+
+recent_badges_count:
+  default: 6
+  type: integer
+  min: 1
+  max: 20
+
 # Total gamification points (all-time) that unlock the first badge of the last
 # tier. The last tier's badge_ids list must begin with the badge awarded at this
 # score; the second id is the "extraordinary contribution" badge.

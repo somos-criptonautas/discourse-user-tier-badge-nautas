@@ -176,7 +176,7 @@
 // Everything except the sidebar stays in the first column, so the plugin
 // outlets that also live in __content (discovery-above, discovery-below) are
 // not pulled into the grid as separate cells.
-@media (min-width: 1100px) {
+@media (width >= 1100px) {
   .discovery-layout__content {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 300px;
@@ -210,5 +210,97 @@
 // for anonymous visitors this one produces nothing. Collapse the wrapper so no
 // empty framed box is left in the sidebar.
 .rs-component.rs-user-tier-badge:not(:has(.user-tier-badge__layout)) {
+  display: none;
+}
+
+.recent-tier-badges {
+  &__layout {
+    background: var(--secondary);
+    border: 1px solid var(--primary-200);
+    border-radius: var(--d-border-radius-large);
+    overflow: hidden;
+  }
+
+  &__title {
+    margin: 0;
+    padding: var(--space-3) var(--space-5);
+    border-bottom: 1px solid var(--primary-low);
+    font-size: var(--font-0);
+    font-weight: 700;
+  }
+
+  &__list {
+    margin: 0;
+    padding: var(--space-2) var(--space-3);
+    list-style: none;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2);
+    padding: var(--space-2);
+    border-radius: var(--d-border-radius);
+
+    &:hover {
+      background: var(--primary-very-low);
+    }
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+    color: var(--primary);
+
+    &:hover {
+      color: var(--primary);
+    }
+
+    .avatar {
+      flex: 0 0 auto;
+    }
+  }
+
+  // Long usernames must not push the row wider than the sidebar.
+  &__username {
+    overflow: hidden;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__earned {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    min-width: 0;
+    font-size: var(--font-down-1);
+  }
+
+  &__badge {
+    overflow: hidden;
+    max-width: 100%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__ago {
+    color: var(--primary-medium);
+  }
+}
+
+// Same double-frame and empty-wrapper handling as the badge above: the host
+// wrapper is already a card, and this block renders nothing until some tier
+// badge has actually been granted.
+.rs-component .recent-tier-badges__layout {
+  background: none;
+  border: 0;
+  border-radius: 0;
+}
+
+.rs-component.rs-recent-tier-badges:not(:has(.recent-tier-badges__layout)) {
   display: none;
 }

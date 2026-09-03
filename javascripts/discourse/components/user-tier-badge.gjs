@@ -8,10 +8,12 @@ import { ajax } from "discourse/lib/ajax";
 import { bind } from "discourse/lib/decorators";
 import getURL from "discourse/lib/get-url";
 import { i18n } from "discourse-i18n";
+import { parseBadgeIds } from "../lib/tiers";
 import { cachedFetch } from "../lib/user-badges-cache";
 
 export default class UserTierBadge extends Component {
   @service currentUser;
+  @service site;
   @service siteSettings;
 
   get displayName() {
@@ -69,6 +71,16 @@ export default class UserTierBadge extends Component {
     });
   }
 
+  // The tier setting stores a group id picked from the live site. Resolve its
+  // name so the tier can link to /g/, and fall back to plain text: groups the
+  // viewer can't see are not serialized, so an unresolved id must not become a
+  // broken link.
+  groupUrl(group) {
+    const id = [].concat(group ?? [])[0];
+    const name = id ? this.site.groupsById?.[id]?.name : null;
+    return name ? getURL(`/g/${name}`) : null;
+  }
+
   // A tier's group can be granted without the badges — by subscription or by
   // hand — so holding it satisfies the tier on its own.
   hasGroup(group) {
@@ -77,19 +89,6 @@ export default class UserTierBadge extends Component {
       return false;
     }
     return this.currentUser.groups?.some((g) => g.id === id) ?? false;
-  }
-
-  // Parse a tier's badge_ids setting into a deduped number array. A repeated id
-  // must not inflate the denominator.
-  parseBadgeIds(raw) {
-    return [
-      ...new Set(
-        String(raw || "")
-          .split(",")
-          .map((id) => parseInt(id, 10))
-          .filter((id) => !isNaN(id))
-      ),
-    ];
   }
 
   // Tiers are evaluated top to bottom: the block shows the first unsatisfied
@@ -109,8 +108,9 @@ export default class UserTierBadge extends Component {
     const tiers = (settings.tiers || [])
       .map((tier) => ({
         name: tier.name,
-        badgeIds: this.parseBadgeIds(tier.badge_ids),
+        badgeIds: parseBadgeIds(tier.badge_ids),
         hasGroup: this.hasGroup(tier.group),
+        groupUrl: this.groupUrl(tier.group),
       }))
       .filter((tier) => tier.badgeIds.length);
 
@@ -162,6 +162,7 @@ export default class UserTierBadge extends Component {
       stats,
       tier: {
         name: next.name,
+        groupUrl: next.groupUrl,
         requirements,
         value: requirements.filter((req) => req.isEarned).length,
         max: requirements.length,
@@ -234,7 +235,13 @@ export default class UserTierBadge extends Component {
             {{else if data.tier}}
               <div class="user-tier-badge__progress">
                 <span class="user-tier-badge__progress-label">
-                  <span>{{i18n (themePrefix data.tier.name)}}</span>
+                  {{#if data.tier.groupUrl}}
+                    <a href={{data.tier.groupUrl}}>
+                      {{i18n (themePrefix data.tier.name)}}
+                    </a>
+                  {{else}}
+                    <span>{{i18n (themePrefix data.tier.name)}}</span>
+                  {{/if}}
                   <span class="user-tier-badge__progress-count">
                     {{data.tier.value}}
                     /

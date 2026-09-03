@@ -36,6 +36,14 @@ function stubKarma(server, helper, score) {
 acceptance("User Tier Badge | tier progress", function (needs) {
   needs.user(ALICE);
 
+  needs.site({
+    groups: [
+      { id: 41, name: "tl1" },
+      { id: 42, name: "tl2" },
+      { id: 43, name: "tl3" },
+    ],
+  });
+
   needs.pretender((server, helper) => {
     server.get("/badges.json", () => helper.response({ badges: SITE_BADGES }));
 
@@ -91,6 +99,14 @@ acceptance("User Tier Badge | tier progress", function (needs) {
       .dom(".user-tier-badge__progress progress")
       .hasAttribute("value", "1");
     assert.dom(".user-tier-badge__progress progress").hasAttribute("max", "3");
+  });
+
+  test("links the tier name to the group that unlocks it", async function (assert) {
+    await visit("/");
+
+    assert
+      .dom(".user-tier-badge__progress-label a")
+      .hasAttribute("href", "/g/tl2");
   });
 
   test("ticks earned badges and links every row to the badge", async function (assert) {
