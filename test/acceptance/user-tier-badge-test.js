@@ -36,6 +36,10 @@ function stubKarma(server, helper, score) {
 acceptance("User Tier Badge | tier progress", function (needs) {
   needs.user(ALICE);
 
+  // The block shows the username when the site prefers it, so the real-name
+  // assertion below has to say which way the site is configured.
+  needs.settings({ prioritize_username_in_ux: false });
+
   needs.site({
     groups: [
       { id: 41, name: "tl1" },
