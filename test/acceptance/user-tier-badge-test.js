@@ -77,7 +77,7 @@ acceptance("User Tier Badge | tier progress", function (needs) {
     settings.tiers = originalTiers;
   });
 
-  test("renders the current user's avatar and profile link", async function (assert) {
+  test("renders the current user's name and profile link", async function (assert) {
     await visit("/");
 
     assert.dom(".user-tier-badge__layout").exists();

@@ -1,7 +1,6 @@
 import Component from "@glimmer/component";
 import { service } from "@ember/service";
 import AsyncContent from "discourse/components/async-content";
-import avatar from "discourse/helpers/avatar";
 import dIcon from "discourse/helpers/d-icon";
 import number from "discourse/helpers/number";
 import { ajax } from "discourse/lib/ajax";
@@ -180,9 +179,8 @@ export default class UserTierBadge extends Component {
           data-user-card={{this.currentUser.username}}
           href={{this.profileUrl}}
         >
-          {{avatar this.currentUser imageSize="medium"}}
           <span class="user-tier-badge__identity">
-            <span class="user-tier-badge__name">{{this.displayName}}</span>
+            <h3 class="user-tier-badge__name">{{this.displayName}}</h3>
             {{#if this.showUsername}}
               <span class="user-tier-badge__username">
                 @{{this.currentUser.username}}
