@@ -205,6 +205,22 @@
   border-radius: 0;
 }
 
+// discourse-right-sidebar-blocks underlines every h3 inside .rs-component to
+// mark it as a section header, and `.rs-component h3` out-specifies our own
+// single-class rules. The member name is not a section header, and the stray
+// underline doubles up with the stats row's top border.
+.rs-component .user-tier-badge__name {
+  padding-bottom: 0;
+  margin-bottom: 0;
+  border-bottom: 0;
+}
+
+// This one does want a separator, just ours rather than the host's spacing.
+.rs-component .recent-tier-badges__title {
+  padding: var(--space-3) var(--space-4);
+  margin: 0;
+}
+
 // The host renders its wrapper whether or not the block produces anything, and
 // for anonymous visitors this one produces nothing. Collapse the wrapper so no
 // empty framed box is left in the sidebar.
