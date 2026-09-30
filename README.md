@@ -1,5 +1,7 @@
 # User Tier Badge
 
+**ENGLISH** | [ESPAÑOL](README.es.md)
+
 Discourse theme component showing a member's progress through custom badge
 tiers — not trust levels. Each tier is a set of badges; completing the set
 unlocks a group.
@@ -25,3 +27,9 @@ unlocks a group.
 
 Upload in **Admin > Customize > Themes**, attach it to your active theme, then
 fill the `tiers` setting with each tier's badge ids and group.
+
+## License
+
+GPL-3.0. See [LICENSE](LICENSE).
+
+Text of this README under [CC BY-NC-SA 4.0](CC-BY-NC-SA-4.0.txt).
