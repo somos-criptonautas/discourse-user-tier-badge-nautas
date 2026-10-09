@@ -2,6 +2,8 @@
 
 [ENGLISH](README.md) | **ESPAÑOL**
 
+Mantenido por Criptonautas. Sin afiliación ni respaldo de Discourse (Civilized Discourse Construction Kit, Inc.).
+
 Componente de tema de Discourse que muestra el avance de un miembro por niveles de
 insignias personalizados (no niveles de confianza). Cada nivel es un conjunto de insignias;
 completar el conjunto desbloquea un grupo.
